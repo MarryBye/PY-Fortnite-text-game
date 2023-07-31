@@ -1,0 +1,1 @@
+Program for memory training maded with PyQt5

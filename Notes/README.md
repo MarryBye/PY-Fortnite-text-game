@@ -1,0 +1,1 @@
+A program for creating notes and saving them on a PC maded with PyQt5

@@ -1,0 +1,17 @@
+{
+    "Ванильная": {
+        "description": "<h1 style='color: yellow; text-align: center;'>Ванильная</h1>\n<h3 style='text-align: center;'>Так по домашнему...</h3>\n<p>Сборка для ванильного выживания с лишь серверными модами/плагинами/датапаками.</p>",
+        "version": "Quilt 1.20.1",
+        "id": "1NViC084R-AUb7ZGB7oQunnE4DWPqsXPc"
+    },
+    "Фростпанк": {
+        "description": "<h1 style='color: cyan; text-align: center;'>Фростпанк</h1>\n<h3 style='text-align: center;'>Очень холодно...</h3>\n<p>Выживание в суровой Воркуте - холод, крысы, снег и видимость 1 сантиметр...</p>",
+        "version": "Forge 1.16.5",
+        "id": "1cvFYcAhjNv8f8zZ8adoCUP2Q6j7bLFYV"
+    },
+    "Солянка": {
+        "description": "<h1 style='color: red; text-align: center;'>Солянка</h1>\n<h3 style='text-align: center;'>А чего тут нет?</h3>\n<p>В этой сборке проще сказать чего нет, чем сказать что тут есть. Сборная солянка из всех самых известных модов, которые были на 1.12.2 и раньше, а может и старых версий современных.</p>",
+        "version": "Forge 1.12.2",
+        "id": "134HyXZN8OnLV4EvC7iKO7i_zJp4muPj9"
+    }
+}

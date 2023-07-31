@@ -1,0 +1,1 @@
+Photo viewer and editing software maded with PyQt5
