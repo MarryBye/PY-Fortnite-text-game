@@ -21,9 +21,7 @@ btn_rotate_left = QPushButton("Влево")
 btn_rotate_right = QPushButton("Вправо")
 btn_flip = QPushButton("Отзеркалить")
 btn_blackandwhite = QPushButton("Ч/Б")
-btn_contrast = QPushButton("Контраст")
-btn_blur = QPushButton("Блюр")
-btn_smooth = QPushButton("Сгладить")
+btn_sharp = QPushButton("Резкость")
 
 photos_list = QListWidget()
 
@@ -41,11 +39,9 @@ right_column.addWidget(label_image)
 button_layout = QHBoxLayout()
 button_layout.addWidget(btn_rotate_left)
 button_layout.addWidget(btn_rotate_right)
-button_layout.addWidget(btn_contrast)
-button_layout.addWidget(btn_blur)
+button_layout.addWidget(btn_sharp)
 button_layout.addWidget(btn_flip)
 button_layout.addWidget(btn_blackandwhite)
-button_layout.addWidget(btn_smooth)
 
 right_column.addLayout(button_layout)
 main_layout.addLayout(left_column, 20)
@@ -113,6 +109,41 @@ class ImageProcessor:
         image_path = os.path.join(save_path, self.file)
         self.image.save(image_path)
 
+    def rotate_left(self):
+        self.image = self.image.transpose(Image.ROTATE_90)
+
+        self.saveImage()
+        image_path = os.path.join(working_directory, self.save_dir, self.file)
+        self.showImage(image_path)
+
+    def rotate_right(self):
+        self.image = self.image.transpose(Image.ROTATE_270)
+
+        self.saveImage()
+        image_path = os.path.join(working_directory, self.save_dir, self.file)
+        self.showImage(image_path)
+
+    def sharpen(self):
+        self.image = self.image.filter(SHARPEN)
+
+        self.saveImage()
+        image_path = os.path.join(working_directory, self.save_dir, self.file)
+        self.showImage(image_path)
+
+    def mirror(self):
+        self.image = self.image.transpose(Image.FLIP_LEFT_RIGHT)
+
+        self.saveImage()
+        image_path = os.path.join(working_directory, self.save_dir, self.file)
+        self.showImage(image_path)
+
+    def makebw(self):
+        self.image = self.image.convert("L")
+
+        self.saveImage()
+        image_path = os.path.join(working_directory, self.save_dir, self.file)
+        self.showImage(image_path)
+
 
 working_image = ImageProcessor()
 
@@ -126,6 +157,11 @@ def showChosenImage():
 
 
 photos_list.currentRowChanged.connect(showChosenImage)
+btn_flip.clicked.connect(working_image.mirror)
+btn_blackandwhite.clicked.connect(working_image.makebw)
+btn_rotate_left.clicked.connect(working_image.rotate_left)
+btn_rotate_right.clicked.connect(working_image.rotate_right)
+btn_sharp.clicked.connect(working_image.sharpen)
 
 
 # Запуск приложения
