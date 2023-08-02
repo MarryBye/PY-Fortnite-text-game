@@ -3,9 +3,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import json
 import os
-import wget
+import requests
+import threading
 import shutil
-import time
 
 stylesheet = """
 * {
@@ -72,7 +72,9 @@ QProgressBar {
     border-width: 2px;
     border-color: gray;
     border-style: solid;
-    color: rgba(0, 0, 0, 0)
+    color: white;
+    font-size: 14px;
+    text-align: center
 }
 QProgressBar::chunk {
     background-color: gray;
@@ -91,7 +93,7 @@ QLineEdit {
 application = QApplication([])
 
 main_window = QWidget()
-main_window.setWindowTitle("GAMERS Launcher")
+main_window.setWindowTitle("GAMERS Modloader")
 main_window.setWindowIcon(QIcon('icon.ico'))
 main_window.resize(640, 480)
 
@@ -169,9 +171,25 @@ window_layout.addWidget(header_group)
 window_layout.addLayout(main_layout)
 window_layout.addWidget(footer_group)
 
-# Создание конфига и сохранение пути
+# ====================================================
+
+# Различные переменные
 
 loaded_config = {}
+versions = {}
+choosed_version = ""
+download_path = "./Downloaded/"
+canStartInstall = True
+need_delition = {
+    "files": ["/options.txt"],
+    "dirs": ["/mods/", "/versions/", "/config/", "/bin/", "/libraries/", "/logs/", "/crash-reports/", "/assets/", "/defaultconfigs/", "/webcache2/", "/server-resource-packs/"]
+}
+url = "https://docs.google.com/uc?export=download&confirm=t&id="
+
+
+# ====================================================
+
+# Создание конфига и сохранение пути
 
 if "config.json" not in os.listdir("./"):
     with open("config.json", "w", encoding="UTF-8") as file:
@@ -189,58 +207,87 @@ input_choosed_dir.setText(loaded_config["minecraft_path"])
 
 def chooseMinecraftDirectory():
     global loaded_config
+    if not canStartInstall:
+        return
     minecraft_directory = QFileDialog.getExistingDirectory()
-    with open("config.json", "w", encoding="UTF-8") as file:
-        loaded_config["minecraft_path"] = minecraft_directory
-        json.dump(loaded_config, file, sort_keys=True,
-                  ensure_ascii=False, indent=4)
-    input_choosed_dir.setText(loaded_config["minecraft_path"])
+    if minecraft_directory != "":
+        with open("config.json", "w", encoding="UTF-8") as file:
+            loaded_config["minecraft_path"] = minecraft_directory
+            json.dump(loaded_config, file, sort_keys=True,
+                      ensure_ascii=False, indent=4)
+        input_choosed_dir.setText(loaded_config["minecraft_path"])
 
 
 btn_choose_dir.clicked.connect(chooseMinecraftDirectory)
 
+# ====================================================
+
+# Выбор версии в списке программы
+
 # Получение списка версий
 
-url = "https://docs.google.com/uc?export=download&confirm=t&id="
-id = "1OAhKgzM_OurZTjNhbTMp8_LWZLJOsAjN"
 
-versions_filename = "versions.json"
+def getVersionsList():
+    global versions
+    # Файл с существующими версиями (ID с гугл диска)
+    versions_response = requests.get(url + "1OAhKgzM_OurZTjNhbTMp8_LWZLJOsAjN")
+    versions = versions_response.json()
 
-if os.path.exists(versions_filename):
-    os.remove(versions_filename)
-versions_file = wget.download(url + id, out=versions_filename)
-
-
-with open(versions_filename, "r", encoding="UTF-8") as file:
-    versions = json.load(file)
     for version in versions:
         versions_list.addItem(version)
-
-choosed_version = ""
 
 
 def chooseVersionFromList():
     global choosed_version
     choosed_version = versions_list.currentItem().text()
+    choosed_version_data = versions[choosed_version]["data"]
+
+    version_name_text, version_name_color = choosed_version_data[
+        "name_text"], choosed_version_data["name_color"]
+    version_undername_text, version_undername_color = choosed_version_data[
+        "undername_text"], choosed_version_data["undername_color"]
+    version_desc_text, version_desc_color = choosed_version_data[
+        "description_text"], choosed_version_data["description_color"]
+    version_version = versions[choosed_version]["version"]
+
     versions_description.setText(
-        f"{versions[choosed_version]['description']}\n<p>Версия: {versions[choosed_version]['version']}</p>")
+        f"""<h1 style='text-align: center; color: {version_name_color}'>{version_name_text}</h1>
+        <h3 style='text-align: center; color: {version_undername_color}'>{version_undername_text}</h3>
+        <p style='color: {version_desc_color}'>{version_desc_text}</p>
+        <p style='color: lightgray'>Версия: {version_version}</p>
+        """)
 
 
 versions_list.currentRowChanged.connect(chooseVersionFromList)
 
+# ====================================================
+
 # Скачивание версии
 
-download_path = ".\\Downloaded\\"
 
-if not os.path.exists("./Downloaded/"):
+if not os.path.exists(download_path):
     os.mkdir("Downloaded")
 
-need_delition = {
-    "files": ["/options.txt"],
-    "dirs": ["/mods/", "/versions/", "/config/", "/bin/", "/libraries/", "/logs/", "/crash-reports/", "/assets/", "/defaultconfigs/", "/webcache2/", "/server-resource-packs/"]
-}
 
-canStartInstall = True
+def getPercentage(now, need):
+    return 100 * int(now) // int(need)
+
+
+def fileDownload(url, file_destination, bar=None):
+    file_res = requests.get(url, stream=True, timeout=5)
+    file_size = file_res.headers.get("content-length")
+    file_downloaded = 0
+    bar.setFormat("Подготовка к скачиванию...")
+    if os.path.exists(file_destination):
+        os.remove(file_destination)
+    download_progressbar.setFormat("Скачивание...")
+    with open(file_destination, "wb") as file:
+        chunks = file_res.iter_content(chunk_size=1024)
+        for chunk in chunks:
+            file_downloaded += 1024
+            file.write(chunk)
+            if bar != None:
+                bar.setValue(getPercentage(file_downloaded, file_size))
 
 
 def downloadVersion():
@@ -253,60 +300,66 @@ def downloadVersion():
         return
 
     canStartInstall = False
-    download_progressbar.setValue(5)
+    btn_choose_dir.setDisabled(True)
+    play_button.setDisabled(True)
+    versions_list.setDisabled(True)
 
-    if os.path.exists(download_path + choosed_version + ".zip"):
-        os.remove(download_path + choosed_version + ".zip")
-    version_downloaded = wget.download(url+versions[choosed_version]
-                                       ["id"], out=download_path + choosed_version + ".zip")
+    version_zip_destination = os.path.join(
+        download_path, choosed_version + ".zip")
+    version_destination = os.path.join(download_path, choosed_version)
 
-    download_progressbar.setValue(50)
+    fileDownload(url + versions[choosed_version]["id"],
+                 version_zip_destination, download_progressbar)
+
+    download_progressbar.setFormat("Удаляю старую версию сборки...")
 
     if os.path.exists(download_path + choosed_version):
         shutil.rmtree(download_path + choosed_version)
 
-    download_progressbar.setValue(75)
+    download_progressbar.setFormat("Распаковка новой версии...")
 
-    shutil.unpack_archive(version_downloaded,
-                          download_path + choosed_version, "zip")
+    shutil.unpack_archive(version_zip_destination, version_destination, "zip")
 
-    download_progressbar.setValue(90)
+    os.remove(version_zip_destination)
 
-    os.remove(version_downloaded)
-
-    download_progressbar.setValue(100)
-
-    time.sleep(1)
-    download_progressbar.setValue(0)
-    time.sleep(1)
-    download_progressbar.setValue(5)
+    download_progressbar.setFormat("Очищаю папку майнкрафта...")
 
     for file in need_delition["files"]:
         file_now = loaded_config["minecraft_path"] + file
         if os.path.exists(file_now):
             os.remove(file_now)
 
-    download_progressbar.setValue(30)
-
     for dir in need_delition["dirs"]:
         dir_now = loaded_config["minecraft_path"] + dir
         if os.path.exists(dir_now):
             shutil.rmtree(dir_now)
 
-    download_progressbar.setValue(70)
+    download_progressbar.setFormat("Установка...")
 
-    shutil.copytree(download_path + choosed_version,
+    shutil.copytree(version_destination,
                     loaded_config["minecraft_path"], dirs_exist_ok=True)
 
-    download_progressbar.setValue(100)
-    time.sleep(1)
+    download_progressbar.setFormat("")
     download_progressbar.setValue(0)
+
+    btn_choose_dir.setDisabled(False)
+    play_button.setDisabled(False)
+    versions_list.setDisabled(False)
     canStartInstall = True
 
 
-play_button.clicked.connect(downloadVersion)
+play_button.clicked.connect(lambda: threading.Thread(
+    target=downloadVersion, daemon=True).start())
+
+# ====================================================
+
+# Загрузить версии вместе с загрузкой программы без пролагов
+threading.Thread(target=getVersionsList, daemon=True).start()
 
 main_window.setLayout(window_layout)
 main_window.show()
+
 application.setStyleSheet(stylesheet)
 application.exec_()
+
+# ====================================================
