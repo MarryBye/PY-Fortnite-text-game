@@ -18,10 +18,13 @@ label_image = QLabel("Картинка")
 
 btn_directory = QPushButton("Папка")
 btn_rotate_left = QPushButton("Влево")
+btn_smooth = QPushButton("Сгладить")
 btn_rotate_right = QPushButton("Вправо")
 btn_flip = QPushButton("Отзеркалить")
 btn_blackandwhite = QPushButton("Ч/Б")
 btn_sharp = QPushButton("Резкость")
+btn_contrast = QPushButton("Контраст")
+btn_blur = QPushButton("Блюр")
 
 photos_list = QListWidget()
 
@@ -39,9 +42,13 @@ right_column.addWidget(label_image)
 button_layout = QHBoxLayout()
 button_layout.addWidget(btn_rotate_left)
 button_layout.addWidget(btn_rotate_right)
+button_layout.addWidget(btn_blur)
+button_layout.addWidget(btn_rotate_right)
+button_layout.addWidget(btn_contrast)
 button_layout.addWidget(btn_sharp)
 button_layout.addWidget(btn_flip)
 button_layout.addWidget(btn_blackandwhite)
+button_layout.addWidget(btn_smooth)
 
 right_column.addLayout(button_layout)
 main_layout.addLayout(left_column, 20)
@@ -144,6 +151,34 @@ class ImageProcessor:
         image_path = os.path.join(working_directory, self.save_dir, self.file)
         self.showImage(image_path)
 
+    def sharpen(self):
+        self.image = self.image.filter(SHARPEN)
+
+        self.saveImage()
+        image_path = os.path.join(working_directory, self.save_dir, self.file)
+        self.showImage(image_path)
+
+    def contrast(self):
+        self.image = ImageEnhance.Contrast(self.image).enhance(1.5)
+
+        self.saveImage()
+        image_path = os.path.join(working_directory, self.save_dir, self.file)
+        self.showImage(image_path)
+
+    def blur(self):
+        self.image = self.image.filter(BLUR)
+
+        self.saveImage()
+        image_path = os.path.join(working_directory, self.save_dir, self.file)
+        self.showImage(image_path)
+
+    def smooth(self):
+        self.image = self.image.filter(SMOOTH)
+
+        self.saveImage()
+        image_path = os.path.join(working_directory, self.save_dir, self.file)
+        self.showImage(image_path)
+
 
 working_image = ImageProcessor()
 
@@ -162,7 +197,9 @@ btn_blackandwhite.clicked.connect(working_image.makebw)
 btn_rotate_left.clicked.connect(working_image.rotate_left)
 btn_rotate_right.clicked.connect(working_image.rotate_right)
 btn_sharp.clicked.connect(working_image.sharpen)
-
+btn_blur.clicked.connect(working_image.blur)
+btn_smooth.clicked.connect(working_image.smooth)
+btn_contrast.clicked.connect(working_image.contrast)
 
 # Запуск приложения
 main_window.show()
