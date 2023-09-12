@@ -156,7 +156,7 @@ footer_group = QGroupBox()
 
 footer_layout = QHBoxLayout()
 
-play_button = QPushButton("Скачать и установить")
+play_button = QPushButton("Скачать и установить!")
 download_progressbar = QProgressBar()
 download_progressbar.setRange(0, 100)
 
