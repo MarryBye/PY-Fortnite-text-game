@@ -1,0 +1,108 @@
+* {
+    border-radius: 8px;
+    font-family: Minecraft Rus;
+}
+QWidget {
+    background-color: rgb(25, 25, 25);
+    color: rgb(180, 180, 180);
+}
+QMessageBox {
+    background-color: rgb(25, 25, 25);
+    color: rgb(180, 180, 180);
+}
+QMessageBox QPushButton {
+    width: 75px;
+}
+QPushButton { 
+    padding: 4px 4px 4px 4px;
+    background-color: gray;
+    border-style: solid;
+    border-width: 2px;
+    border-color: gray;
+    color: lightgray;
+}
+QPushButton:hover {
+    background-color: lightgray;
+    border-color: white;
+    color: black;
+}
+QGroupBox {
+    border-style: solid;
+    border-width: 3px;
+    border-color: gray;
+}
+QGroupBox::title {
+    subcontrol-origin: padding;
+    subcontrol-position: top center;
+    font-size: 14px;
+}
+QListWidget {
+    border: none;
+    show-decoration-selected: 0;
+    outline: 0;
+}
+QListWidget QScrollBar {
+    width: 0px;
+    height: 0px;
+    border: 2px solid grey;
+    background: #32CC99;
+    padding-left: 15px;
+}
+QListWidget QScrollBar::handle {
+    background: red;
+    min-width: 20px;
+}
+QListWidget::item {
+    border: none;
+    margin-top: 4px;
+    text-align: center;
+    padding: 4px 4px 4px 4px;
+    margin-right: 4px;
+    margin-left: 4px;
+    border-radius: 8px;
+    color: lightgray;
+}
+QListWidget::item:hover {
+    border-width: 2px;
+    border-color: gray;
+    border-style: solid;
+    color: lightgray;
+}
+QListWidget::item:selected {
+    border-width: 2px;
+    border-color: gray;
+    border-style: solid;
+    background-color: rgba(25, 55, 125, 0.25);
+    color: lightgray;
+}
+.QListWidget::item#donat {
+    background-color: rgb(25, 25, 25);
+    border: none;
+}
+.QListWidget::item:hover#donat {
+    background-color: rgb(25, 25, 25);
+    border: none;
+}
+QTextEdit {
+    border: none;
+}
+QProgressBar {
+    border-width: 2px;
+    border-color: gray;
+    border-style: solid;
+    color: white;
+    font-size: 14px;
+    text-align: center
+}
+QProgressBar::chunk {
+    background-color: gray;
+    width: 5px;
+    margin-left: 1px;
+    margin-right: 1px;
+}
+QLineEdit {
+    border-width: 2px;
+    border-color: gray;
+    border-style: solid;
+    padding: 4px 4px 4px 4px;
+}
