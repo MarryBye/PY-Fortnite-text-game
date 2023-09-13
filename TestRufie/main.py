@@ -1,19 +1,18 @@
 from kivy.app import App
+from kivy.core.window import Window
+from kivy.graphics import Rectangle, Color
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.textinput import TextInput
 from kivy.uix.video import Video
 from kivy.uix.videoplayer import VideoPlayer
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.uix.textinput import TextInput
-from kivy.core.window import Window
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.image import Image, AsyncImage
-from instructions import txt_instruction, txt_test1, txt_test2, txt_test3, txt_sits
+from kivy.uix.image import Image
+
+
+from instructions import txt_instruction, txt_test1, txt_test3, txt_sits
 from ruffier import test
-from timer import Timer
-from sits import *
 from runner import *
+from sits import *
+from timer import Timer
 
 age = 7
 name = "Вася"
@@ -41,22 +40,39 @@ class FirstScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.logo = VideoPlayer(source='intro.mp4', state='play', options={'eos': 'loop'})
-        self.logo.remove_widget(self.logo.children[0])
+        with self.canvas:
+            Color(0.23, 0.5, 0, 1)
+            self.rect = Rectangle(source="1.jpg", pos=(0, 0), size=(1280, 720))
 
         self.lbl_info = Label(text=txt_instruction,
                               halign="center", valign="middle")
+
+        self.logo = VideoPlayer(state='play', options={'eos': 'loop'})
+        self.logo.remove_widget(self.logo.children[0])
+
+        self.image_logo = Image(source="1.jpg")
+
         self.lbl_info.font_size = 16
-        self.lbl_info.outline_color = (0, 0, 0, 1)
-        self.lbl_info.outline_width = 2
+        self.lbl_info.outline_color = (0.55, 0.35, 0.55, 1)
+        self.lbl_info.outline_width = 1
+
         self.lbl_name = Label(text="Введіть ім'я: ")
+        self.lbl_name.outline_color = (0.55, 0.35, 0.55, 1)
+        self.lbl_name.outline_width = 1
+
         self.lbl_age = Label(text="Скільки вам років: ")
+        self.lbl_age.outline_color = (0.55, 0.35, 0.55, 1)
+        self.lbl_age.outline_width = 1
 
         self.input_name = TextInput(text=name, multiline=False)
+        self.input_name.foreground_color = (1, 0, 0, 1)
         self.input_age = TextInput(text=str(age), multiline=False)
 
-        self.btn_next = Button(text="Почати тест!", size_hint=(
-            0.35, 0.15), pos_hint={"center_x": 0.5})
+        self.btn_next = Button(text="[i] Почати тест! [/i]", size_hint=(
+            0.35, 0.15), pos_hint={"center_x": 0.5}, markup=True)
+        self.btn_next.outline_color = (0.55, 0.35, 0.55, 1)
+        self.btn_next.outline_width = 1
+        self.btn_next.background_color = (0, 0, 0, 1)
         self.btn_next.on_press = self.next
 
         self.main_layout = BoxLayout(
@@ -72,6 +88,7 @@ class FirstScreen(Screen):
         self.line_2.add_widget(self.input_age)
 
         self.main_layout.add_widget(self.logo)
+        self.main_layout.add_widget(self.image_logo)
         self.main_layout.add_widget(self.lbl_info)
         self.main_layout.add_widget(self.line_1)
         self.main_layout.add_widget(self.line_2)
@@ -94,7 +111,7 @@ class SecondScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.lbl_info = Label(text=txt_test1)
+        self.lbl_info = Label(text=txt_test1, halign="center", valign="middle")
 
         self.timer_lbl = Timer(1)
         self.timer_lbl.bind(done=self.on_timer_done)
@@ -262,7 +279,7 @@ class FifthScreen(Screen):
     def loadPage(self):
         global name, p1, p2, p3, age
 
-        self.lbl_info.text = name + "\n" + test(p1, p2, p3, age)
+        self.lbl_info.text = name + "\n" + text
 
 
 class RufieApp(App):
