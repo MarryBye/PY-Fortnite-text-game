@@ -1,49 +1,18 @@
-# Импортируем библиотеку numpy для работы с массивами
-import numpy as np
+class Vector:
+    def __init__(self, p1: tuple = (0, 0), p2: tuple = (0, 0)):
+        self.p1 = p1
+        self.p2 = p2
+        self.coordinates = (p2[0] - p1[0], p2[1] - p1[1])
 
-# Задаем входные данные X и ожидаемые выходные данные y
-X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-y = np.array([0, 0, 0, 1])
+    def __str__(self) -> str:
+        return f"Vector {self.coordinates}"
 
-# Задаем случайные веса w и порог b
-w = np.random.rand(2)
-b = np.random.rand()
+    def __add__(self, v):
+        return (self.coordinates[0] + v.coordinates[0], self.coordinates[1] + v.coordinates[1])
 
-# Задаем скорость обучения alpha и количество эпох epochs
-alpha = 0.1
-epochs = 10
 
-# Определяем функцию активации (в данном случае сигмоиду)
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+vec1 = Vector((15, 7), (12, 13))
+vec2 = Vector((3, -5), (-5, 16))
 
-# Определяем функцию производной от сигмоиды
-def sigmoid_prime(x):
-    return sigmoid(x) * (1 - sigmoid(x))
-
-# Начинаем обучение персептрона
-for epoch in range(epochs):
-    # Для каждого образца из входных данных
-    for i in range(len(X)):
-        # Вычисляем сумму взвешенных входов и добавляем порог
-        z = np.dot(X[i], w) + b
-        # Вычисляем выход персептрона с помощью функции активации
-        y_pred = sigmoid(z)
-        # Вычисляем ошибку как разность между ожидаемым и предсказанным выходом
-        error = y[i] - y_pred
-        # Обновляем веса и порог с помощью правила дельты и скорости обучения
-        w = w + alpha * error * sigmoid_prime(z) * X[i]
-        b = b + alpha * error * sigmoid_prime(z)
-    # Выводим номер эпохи и среднюю квадратичную ошибку по всем образцам
-    mse = np.mean((y - sigmoid(np.dot(X, w) + b)) ** 2)
-    print(f"Эпоха {epoch + 1}, ошибка {mse:.4f}")
-
-# Выводим полученные веса и порог
-print(f"Веса: {w}")
-print(f"Порог: {b}")
-
-# Тестируем персептрон на входных данных и выводим результаты
-for i in range(len(X)):
-    z = np.dot(X[i], w) + b
-    y_pred = sigmoid(z)
-    print(f"Вход: {X[i]}, выход: {y_pred:.4f}")
+print(vec1)
+print(vec1 + vec2)
