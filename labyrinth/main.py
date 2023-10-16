@@ -81,18 +81,44 @@ def makeImage(img, w, h):
 
 background = makeImage("background.jpg", 800, 600)
 
-player = Player("hero.png", 100, 500, 50, 50, 5)
-enemy = Enemy("cyborg.png", 100, 100, 50, 50, 5)
+enemy_start_x, enemy_start_y = 300, 400
+enemy_x_start, enemy_x_end = 300, 0
+
+player = Player("hero.png", 100, 500, 35, 35, 5)
+enemy = Enemy("cyborg.png", enemy_start_x, enemy_start_y, 50, 50, 5)
 treasure = GameSprite("treasure.png", 700, 500, 75, 75, 5)
 
 walls = []
 
+# Wall(цвет, х, у, ширина, высота)
+# Вертикальная стенка - ширина < высота
+# Горизонтальная стенка - ширина > высота
 # начальная координата - 100, конечная - 400
-w1 = Wall((255, 128, 67), 100, 100, 300, 8)
-w2 = Wall((255, 128, 67), 400, 100, 8, 150)
-w3 = Wall((255, 128, 67), 400, 246, 150, 8)
-w4 = Wall((255, 128, 67), 497, 115, 150, 150)
+Wall((255, 128, 67), 100, 100, 300, 8)
+Wall((255, 128, 67), 400, 100, 8, 150)
+Wall((255, 128, 67), 400, 246, 150, 8)
+Wall((255, 128, 67), 100, 108, 8, 350)
+Wall((255, 128, 67), 187, 378, 150, 8)
+Wall((255, 128, 67), 187, 100, 8, 278)
+Wall((255, 128, 67), 278, 246, 120, 8)
+Wall((255, 128, 67), 278, 100, 8, 150)
+Wall((255, 128, 67), 337, 100, 8, 82)
+Wall((255, 128, 67), 337, 246, 8, 82)
+Wall((255, 128, 67), 100, 100, 300, 8)
+Wall((255, 128, 67), 400, 100, 8, 150)
+Wall((255, 128, 67), 400, 246, 150, 8)
+Wall((255, 128, 67), 100, 108, 8, 350)
+Wall((255, 128, 67), 187, 378, 150, 8)
+Wall((255, 128, 67), 682, 100, 8, 500)
+Wall((255, 128, 67), 194, 451, 490, 8)
+Wall((255, 128, 67), 525, 320, 100, 8)
+Wall((255, 128, 67), 575, 275, 8, 100)
+Wall((255, 128, 67), 485, 100, 200, 8)
+Wall((255, 128, 67), 0, 455, 108, 8)
 
+# Вертикальные стенки, чтобы закрыть квадрат
+Wall((255, 128, 67), 250, 100, 8, 150)
+Wall((255, 128, 67), 250, 246, 8, 142)
 
 finish = False
 game_over = False
@@ -136,7 +162,7 @@ while not game_over:
                 player.rect.y = 500
 
         player.update()
-        enemy.update(100, -100)
+        enemy.update(enemy_x_start, enemy_x_end)
 
         if sprite.collide_rect(player, enemy):
             finish = True
@@ -145,6 +171,7 @@ while not game_over:
 
         if sprite.collide_rect(player, treasure):
             finish = True
+
             win_sound.play()
             window.blit(win_text, (200, 200))
 

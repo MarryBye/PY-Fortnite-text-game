@@ -110,7 +110,7 @@ class NumericNeuron:
         return out >= 0.75
 
     # То же получение результата, просто сокращен момент замены входов на другие
-    def check_for(self, inputs: list):
+    def check_for(self, inputs: list) -> bool:
         self.inputs = inputs
         return self.get_result()
 

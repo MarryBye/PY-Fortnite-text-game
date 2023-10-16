@@ -1,214 +1,191 @@
-import json
-import os
-
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-app = QApplication([])  # Создаем приложение
+import json
 
-main_window = QWidget()  # Создали окно приложения
-main_window.setWindowTitle("Заметки")  # Назвали окно
-main_window.resize(1000, 700)  # Задали размер окна
+app = QApplication([])  # віджет "додаток", сама програма
 
-# Создаем все элементы программы, но еще не располагаем их
-note_text_field = QTextEdit() # Большое текстовое поле под текст заметки
-notes_list = QListWidget()  # Список заметок
-tags_list = QListWidget()  # Список тегов
+main_window = QWidget()  # віджет "вікно", головне вікно нашої програми
+main_window.setWindowTitle("Розумні замітки")  # встановили назву вікна
+main_window.resize(900, 600)  # встановили розмір вікна
 
-add_note_button = QPushButton("Добавить заметку")
-delete_note_button = QPushButton("Удалить заметку")
-edit_note_button = QPushButton("Редактировать заметку")
+# ВІДЖЕТИ
 
-add_tag_button = QPushButton("Добавить тег")
-delete_tag_button = QPushButton("Удалить тег")
-find_by_tag_button = QPushButton("Искать по тегу")
+list_notes = QListWidget()  # список заміток (права колонка)
+list_notes_label = QLabel("Список заміток")  # створення текст
 
-notes_list_label = QLabel("Список заметок")
-tags_list_label = QLabel("Список тегов")
+button_note_create = QPushButton("Створити замітку")  # створити кнопку
+button_note_del = QPushButton("Видалити замітку")
+button_note_save = QPushButton("Зберегти замітку")
 
-find_by_tag_input = QLineEdit()
-find_by_tag_input.setPlaceholderText("Введите тег...")
+field_tag = QLineEdit("")  # поле для введення (1 рядок)
+field_tag.setPlaceholderText("Введіть тег...")  # заглушка для поля введеня
 
-# Располагаем все элементы по местам
-# Главный лейаут, в котором все объединим
-main_layout = QHBoxLayout()
+field_text = QTextEdit()  # поле для введення (багато рядків)
 
-# Левая часть программы
-left_col = QVBoxLayout()
-left_col.addWidget(note_text_field)
+button_tag_add = QPushButton("Додати тег")
+button_tag_del = QPushButton("Видалити тег")
+button_tag_search = QPushButton("Шукати за тегами")
 
-# Правая часть программы
-right_col = QVBoxLayout()
-right_col.addWidget(notes_list_label)
-right_col.addWidget(notes_list)
+tag_list = QListWidget()
+tag_list_label = QLabel("Список тегів")
 
-buttons_layout_1 = QHBoxLayout()
-buttons_layout_1.addWidget(add_note_button)
-buttons_layout_1.addWidget(delete_note_button)
-buttons_layout_2 = QHBoxLayout()
-buttons_layout_2.addWidget(edit_note_button)
 
-right_col.addLayout(buttons_layout_1)
-right_col.addLayout(buttons_layout_2)
+# ============================================
 
-right_col.addWidget(tags_list_label)
-right_col.addWidget(tags_list)
-right_col.addWidget(find_by_tag_input)
+# ЛЕЙАУТИ
 
-buttons_layout_3 = QHBoxLayout()
-buttons_layout_3.addWidget(add_tag_button)
-buttons_layout_3.addWidget(delete_tag_button)
-buttons_layout_4 = QHBoxLayout()
-buttons_layout_4.addWidget(find_by_tag_button)
+main_layout = QHBoxLayout()  # горизонтальна лінія
+column_left = QVBoxLayout()  # вертикальна лінія (ліва колонка)
+column_right = QVBoxLayout()  # вертикальна лінія (права колонка)
 
-right_col.addLayout(buttons_layout_3)
-right_col.addLayout(buttons_layout_4)
+column_left.addWidget(field_text)  # додали в ліву колонку наш QTextEdit
 
-# Объединили правую и левую часть программы
-main_layout.addLayout(left_col)
-main_layout.addLayout(right_col)
+column_right.addWidget(list_notes_label)
+column_right.addWidget(list_notes)
 
-# Логика программы
-path_to_json = "C:\\Users\\vikto\\Documents\\Projects\\Zametki\\"
+buttons_row_1 = QHBoxLayout()
+buttons_row_1.addWidget(button_note_create)
+buttons_row_1.addWidget(button_note_del)
 
-notes = {}
+column_right.addWidget(button_note_save)
+column_right.addLayout(buttons_row_1)
+column_right.addWidget(tag_list_label)
+column_right.addWidget(tag_list)
+column_right.addWidget(field_tag)
 
-for filename in os.listdir(path_to_json): # Получаем все файлы в папке
-    if ".json" in filename:
-        fname, fext = os.path.splitext(filename) # Отделили название от расширения
-        with open(path_to_json + fname + fext, "r", encoding="UTF-8") as file:
-            note = json.load(file) # Загрузили файл
-            notes[fname] = note[fname] # Скопировали заметку из файла
-            
-notes_list.addItems(notes) # Загрузили в список в программе заметки
+buttons_row_2 = QHBoxLayout()
+buttons_row_2.addWidget(button_tag_add)
+buttons_row_2.addWidget(button_tag_del)
 
-# При нажатии на заметку из списка
-def open_note_info():
-    # Ключ заметки, к которой обращаемся в Json файле
-    key = notes_list.selectedItems()[0].text()
-    # Добавляем текст заметки в большое текстовое поле
-    note_text_field.setText(notes[key]["текст"])
-    # Очищаем старые теги от прошлой заметки (если есть)
-    tags_list.clear()
-    # Добавляем теги текущей заметки
-    tags_list.addItems(notes[key]["теги"])
-    
-# Функция добавления заметки
+column_right.addWidget(button_tag_search)
+column_right.addLayout(buttons_row_2)
+
+main_layout.addLayout(column_left, stretch=2)
+main_layout.addLayout(column_right, stretch=1)
+
+# ============================================
+
+# ФУНКЦІОНАЛ
+
+notes_copy = {}
+
+
+def show_note():
+    key = list_notes.selectedItems()[0].text()
+    field_text.setText(notes_copy[key]["текст"])
+    tag_list.clear()
+    tag_list.addItems(notes_copy[key]["теги"])
+
+
 def add_note():
-    note_name, ok = QInputDialog.getText(main_window, "Добавить заметку", "Название: ")
+    note_name, ok = QInputDialog.getText(
+        main_window, "Додати замітку", "Назва замітки: ")
     if ok and note_name != "":
-        notes[note_name] = {"текст": "", "теги": []}
-        notes_list.addItem(note_name)
-        tags_list.addItems(notes[note_name]["теги"])
-        
-# Редактирование заметок
-def edit_note():
-    if notes_list.selectedItems():
-        key = notes_list.selectedItems()[0].text()
-        notes[key]["текст"] = note_text_field.toPlainText()
-        new_note = { # Создали образец заметки
-            key: {
-                "текст": notes[key]["текст"],
-                "теги": notes[key]["теги"]
-            }
-        }
-        with open(path_to_json + key + ".json", "w", encoding="UTF-8") as file:
-            json.dump(new_note, file, sort_keys=True, ensure_ascii=False, indent=4)
-    else:
-        print("Заметка для редактирования не выбрана!")
-        
-def delete_note():
-    if notes_list.selectedItems():
-        key = notes_list.selectedItems()[0].text()
-        del notes[key]
-        tags_list.clear()
-        note_text_field.clear()
-        notes_list.clear()
-        notes_list.addItems(notes)
-        os.remove(path_to_json + key + ".json") # Удаление файла с компьютера
-    else:
-        print("Вы не выбрали заметку для удаления!")
-        
+        notes_copy[note_name] = {"текст": "", "теги": []}
+        list_notes.addItem(note_name)
+        tag_list.addItems(notes_copy[note_name]["теги"])
+
+
+def save_note():
+    if list_notes.selectedItems():
+        key = list_notes.selectedItems()[0].text()
+        notes_copy[key]["текст"] = field_text.toPlainText()
+
+        with open("./notes.json", "w") as file:
+            json.dump(notes_copy, file, sort_keys=True,
+                      ensure_ascii=False, indent=4)
+
+
+def del_note():
+    if list_notes.selectedItems():
+        key = list_notes.selectedItems()[0].text()
+        del notes_copy[key]
+        list_notes.clear()
+        tag_list.clear()
+        field_text.clear()
+        list_notes.addItems(notes_copy)
+
+        with open("./notes.json", "w") as file:
+            json.dump(notes_copy, file, sort_keys=True,
+                      ensure_ascii=False, indent=4)
+
+
 def add_tag():
-    if notes_list.selectedItems():
-        key = notes_list.selectedItems()[0].text()
-        tag = find_by_tag_input.text()
-        if tag != "" and not tag in notes[key]["теги"]:
-            notes[key]["теги"].append(tag)
-            tags_list.addItem(tag)
-            find_by_tag_input.clear()
-            new_note = {
-                key: {
-                    "текст": notes[key]["текст"],
-                    "теги": notes[key]["теги"]
-                }
-            }
-            with open(path_to_json + key + ".json", "w", encoding="UTF-8") as file:
-                json.dump(new_note, file, sort_keys=True, ensure_ascii=False, indent=4)
-        else:
-            print("Такой тег уже существует у данной заметки!")
-    else:
-        print("Заметка, которой надо добавить тег не выбрана!")
-        
-def delete_tag():
-    if notes_list.selectedItems():
-        key = notes_list.selectedItems()[0].text()
-        if tags_list.selectedItems():
-            tag = tags_list.selectedItems()[0].text()
-            notes[key]["теги"].remove(tag)
-            tags_list.clear()
-            tags_list.addItems(notes[key]["теги"])
-            new_note = {
-                key: {
-                    "текст": notes[key]["текст"],
-                    "теги": notes[key]["теги"]
-                }
-            }
-            with open(path_to_json + key + ".json", "w", encoding="UTF-8") as file:
-                json.dump(new_note, file, sort_keys=True, ensure_ascii=False, indent=4)
-        else:
-            print("Вы не выбрали тег, который хотите удалить!")
-    else:
-        print("Вы не выбрали заметку, у которой надо удалить тег!")
-        
+    if list_notes.selectedItems():
+        key = list_notes.selectedItems()[0].text()
+        tag = field_tag.text()
+        if tag != "":
+            if not tag in notes_copy[key]["теги"]:
+                notes_copy[key]["теги"].append(tag)
+                tag_list.addItem(tag)
+                field_tag.clear()
+
+                with open("./notes.json", "w") as file:
+                    json.dump(notes_copy, file, sort_keys=True,
+                              ensure_ascii=False, indent=4)
+
+
+def del_tag():
+    if list_notes.selectedItems():
+        if tag_list.selectedItems():
+            key = list_notes.selectedItems()[0].text()
+            tag = tag_list.selectedItems()[0].text()
+
+            notes_copy[key]["теги"].remove(tag)
+            tag_list.clear()
+            tag_list.addItems(notes_copy[key]["теги"])
+
+            with open("./notes.json", "w") as file:
+                json.dump(notes_copy, file, sort_keys=True,
+                          ensure_ascii=False, indent=4)
+
+
 def find_by_tag():
-    tag = find_by_tag_input.text()
-    if find_by_tag_button.text() == "Искать по тегу" and tag != "":
-        find_by_tag_button.setText("Сбросить фильтр")
-        notes_filtered = {}
-        for note in notes:
-            if tag in notes[note]["теги"]:
-                notes_filtered[note]=notes[note]
-        notes_list.clear()
-        tags_list.clear()
-        notes_list.addItems(notes_filtered)
-        find_by_tag_input.clear()
-    elif find_by_tag_button.text() == "Сбросить фильтр":
-        find_by_tag_button.setText("Искать по тегу")
-        notes_list.clear()
-        tags_list.clear()
-        notes_list.addItems(notes)
-        find_by_tag_input.clear()
-    else:
-        pass
-        
-        
-# Когда нажали на одну из заметок в списке
-notes_list.itemClicked.connect(open_note_info)
-# Нажали на кнопку добавить заметку
-add_note_button.clicked.connect(add_note)
-# Нажали на кнопку редактировать заметку
-edit_note_button.clicked.connect(edit_note)
-# Нажали на кнопку удалить заметку
-delete_note_button.clicked.connect(delete_note)
-# Нажали на кнопку добавить тег
-add_tag_button.clicked.connect(add_tag)
-# Нажали на кнопку удалить тег
-delete_tag_button.clicked.connect(delete_tag)
-# Нажали на кнопку искать по тегу
-find_by_tag_button.clicked.connect(find_by_tag)
+    tag = field_tag.text()
+    if tag != "":
+        if button_tag_search.text() == "Шукати за тегами":
+            notes_filter = {}
+            for note in notes_copy:
+                if tag in notes_copy[note]["теги"]:
+                    notes_filter[note] = notes_copy[note]
+            button_tag_search.setText("Скинути пошук")
+            list_notes.clear()
+            tag_list.clear()
+            list_notes.addItems(notes_filter)
+        elif button_tag_search.text() == "Скинути пошук":
+            field_tag.clear()
+            list_notes.clear()
+            tag_list.clear()
+            list_notes.addItems(notes_copy)
+            button_tag_search.setText("Шукати за тегами")
+        else:
+            pass
 
-main_window.setLayout(main_layout) # Установили расположение элементов в окне
 
-main_window.show() # Показать главное окно
-app.exec_()  # Запускаем приложение
+list_notes.itemClicked.connect(show_note)
+button_note_create.clicked.connect(add_note)
+button_note_save.clicked.connect(save_note)
+button_note_del.clicked.connect(del_note)
+button_tag_add.clicked.connect(add_tag)
+button_tag_del.clicked.connect(del_tag)
+button_tag_search.clicked.connect(find_by_tag)
+
+# json.load() - завантажує все що написано в файлі
+# json.dump() - зберегає щось до файлу
+# r - читання, w - запис, a - додати
+
+
+with open("./notes.json", "r") as file:
+    notes_copy = json.load(file)
+
+# addItem, addItems
+list_notes.addItems(notes_copy)
+
+# ============================================
+
+# головне вікно буде мати ось таке розташування елементів
+main_window.setLayout(main_layout)
+
+main_window.show()  # показати віджет "вікно"
+app.exec()  # запуск додатку

@@ -1,11 +1,9 @@
 from pygame import *
 from random import randint
+from assets_table import sprites
 
 win_width, win_height = 800, 600
 window = display.set_mode((win_width, win_height))
-
-kills = 0
-losts = 0
 
 
 def MakeImage(img, w, h):
@@ -37,6 +35,9 @@ class GameSprite(sprite.Sprite):
 
 
 class Player(GameSprite):
+    kills, losts = 0, 0
+    bullets = sprite.Group()
+
     def update(self):
         keys = key.get_pressed()
         if keys[K_LEFT] or keys[K_a]:
@@ -46,12 +47,23 @@ class Player(GameSprite):
             if self.rect.x < win_width - self.width:
                 self.rect.x += self.speed
 
+    def fire(self):
+        bullet = Bullet(sprites["BULLET"],
+                        self.rect.centerx - 7.5, self.rect.top, 15, 15, 10)
+        self.bullets.add(bullet)
+
 
 class Enemy(GameSprite):
     def update(self):
         global losts
         self.rect.y += self.speed
         if self.rect.y > win_height:
-            self.rect.x = randint(self.width, win_width - self.width)
-            self.rect.y = 0
-            losts += 1
+            self.kill()
+            Player.losts += 1
+
+
+class Bullet(GameSprite):
+    def update(self):
+        self.rect.y -= self.speed
+        if self.rect.y < 0:
+            self.kill()

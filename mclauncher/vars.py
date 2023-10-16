@@ -5,9 +5,9 @@ import requests
 
 url = "https://docs.google.com/uc?export=download&confirm=t&id="
 
-MODLOADER_VERSION = "1.0.2"
+MODLOADER_VERSION = "1.0.3"
 MODLOADER_CLOUD_INFO = requests.get(
-    url + "1LGwMRz4-uEKSNTE8EOuKgCXVe2ilTBRN").json()
+    url + "1y404KwKV1Pz9vvzwz5LWEz-SnRxGjkIa").json()
 
 choosed_version = ""
 download_path = "./Downloaded/"
