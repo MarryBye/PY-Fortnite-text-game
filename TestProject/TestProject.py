@@ -99,16 +99,14 @@ class Map:
 class Level:
     def __init__(self, scheme: list):
         self.scheme = scheme
-        for layer in scheme:
-            row_now = scheme.index(layer)
-            for room in layer:
-                room_now = scheme[row_now].index(room)
+        for k_layer, layer in enumerate(scheme):
+            for k_room, room in enumerate(layer):
                 if room is None:
                     continue
-                room.paths[Side.TOP] = row_now > 0 and scheme[row_now - 1][room_now] != None
-                room.paths[Side.LEFT] = room_now > 0 and scheme[row_now][room_now - 1] != None
-                room.paths[Side.BOTTOM] = row_now < len(scheme) - 1 and scheme[row_now + 1][room_now] != None
-                room.paths[Side.RIGHT] = room_now < len(layer) - 1 and scheme[row_now][room_now + 1] != None
+                room.paths[Side.TOP] = k_layer > 0 and scheme[k_layer - 1][k_room] != None
+                room.paths[Side.LEFT] = k_room > 0 and scheme[k_layer][k_room - 1] != None
+                room.paths[Side.BOTTOM] = k_layer < len(scheme) - 1 and scheme[k_layer + 1][k_room] != None
+                room.paths[Side.RIGHT] = k_room < len(layer) - 1 and scheme[k_layer][k_room + 1] != None
 
 
 class Room:
@@ -119,7 +117,14 @@ class Room:
         self.items_objects = []
 
     def place_walls(self):
-        pass
+        if self.paths[Side.TOP]:
+            pass
+        if self.paths[Side.LEFT]:
+            pass
+        if self.paths[Side.BOTTOM]:
+            pass
+        if self.paths[Side.RIGHT]:
+            pass
 
 
 level1 = [
